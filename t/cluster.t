@@ -6,11 +6,11 @@ BEGIN { use_ok('Chemistry::Clusterer::Cluster') }
 
 # Class attributes and methods.
 my @methods = qw(members add_members size centroid score );
-can_ok( 'Chemistry::Cluster', @methods );
+can_ok( 'Chemistry::Clusterer::Cluster', @methods );
 
 # Constructor.
 my $cluster = Chemistry::Clusterer::Cluster->new;
-isa_ok( $cluster, 'Chemistry::Cluster' );
+isa_ok( $cluster, 'Chemistry::Clusterer::Cluster' );
 
 # We can put stuff in it
 my @things = qw(foo bar);
