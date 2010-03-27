@@ -9,25 +9,5 @@
     it will look in the appropriate namespace and load that module.
 
 * Accept Chemistry::Mol and, if I feel like it, Bio::Structure objects
-* Have an option to select aminoacid type to take the coords for?
-
-    * problema: no tengo acceso a $self desde type coercions, no puedo saber la
-    opcion que eligio el usuario
-
-    * solucion:
-
-    1. que Structure guarde toda la informacion, y Clusterer extrae lo
-    importante justo antes de hacer el calculo. Para eso, hacer que ::Structure
-    = Chemistry::MacroMol y ya esta. Performance: ~ 30 estructuras/s contra >
-    800 estructuras/s aj.  Despues clusterer usa un proxy object para extraer
-    las coordenadas de C::Mol. Este objeto se guarda en un atributo, y tiene
-    que consumir el rol "CoordExtractor", que exige la implementacion del
-    metodo "extract_coords".
-
-    2. otra solucion: ditch coercion altogether. Poner la logica de
-    dispatch en un lazy_build que construya el atributo coords a partir de
-    cada type. Hay una manera de usar los Type Contraints en subrutinas
-    comunes.
-
-
 * Add an option to align all structures before clustering
+* Maybe parse the header in PDB files, and attach it to the Structure
