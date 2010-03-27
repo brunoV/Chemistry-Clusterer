@@ -6,20 +6,20 @@ BEGIN { use_ok( 'Chemistry::Clusterer::Structure' ) }
 
 my $pdb_file = 't/data/2.pdb';
 
-my @coords = split /\s+/, join '', <DATA>;
+my @coords = sort split /\s+/, join '', <DATA>;
 
 open( my $fh, '<', $pdb_file );
 my $content = do { local $/; <$fh> };
 
 open( $fh, '<', $pdb_file );
 
-foreach my $input ($content, $fh, \@coords) {
+foreach my $input ($content, $fh, { CA => { L => \@coords } } ) {
 
     my $structure = Chemistry::Clusterer::Structure->new( coords => $input );
 
     isa_ok( $structure, 'Chemistry::Clusterer::Structure' );
 
-    is_deeply( $structure->coords, \@coords );
+    is_deeply( [ sort @{$structure->coords->{CA}{L}} ], \@coords );
 }
 
 done_testing();
