@@ -1,6 +1,6 @@
 package Chemistry::Clusterer;
 
-#ABSTRACT: Cluster spatial variants of macromolecular structures
+# ABSTRACT: Cluster spatial variants of macromolecular structures
 
 use Moose;
 use MooseX::Types::Moose qw(HashRef ArrayRef Num);
@@ -30,6 +30,43 @@ has clusters => (
     }
 );
 
+has coordinates_from => (
+    is => 'ro',
+    default => sub { +{ atom_type => 'CA' } },
+);
+
+has _coord_extractor => (
+    is         => 'ro',
+    lazy_build => 1,
+    handles    => {
+        _extract_coords => 'extract_coords'
+    },
+);
+
+sub _build__coord_extractor {
+    my $self = shift;
+
+    my ($extractor_name, @options);
+
+    if (ref $self->coordinates_from eq 'HASH') {
+        ($extractor_name, @options) = %{ $self->coordinates_from };
+    }
+    else {
+        $extractor_name = $self->coordinates_from;
+    }
+
+    my $extractor = _get_module_name(
+        'Chemistry::Clusterer::CoordExtractor::',
+        $extractor_name,
+    );
+
+    require Module::Load;
+    Module::Load::load( $extractor );
+
+    return $extractor->new(args => \@options);
+
+}
+
 has _raw_error => ( is => 'rw' );
 
 has error => (
@@ -39,6 +76,9 @@ has error => (
 
 sub _build_error {
     my $self = shift;
+
+    # Calling cluster_count before _raw_error guarantees that _raw_error
+    # will be defined
 
     my $nstructs  = $self->structure_count;
     my $nclusters = $self->cluster_count;
@@ -131,7 +171,8 @@ sub _calc_distance_matrix {
 
     my $self = shift;
 
-    my @coords = map { $_->coords } @{$self->structures};
+    my @coords =
+      map { $self->_extract_coords( $_->coords ) } @{ $self->structures };
 
     my %dist_params = (
         transpose => 0,
@@ -166,9 +207,20 @@ sub _radius_to_number {
     return $nclusters;
 }
 
-__PACKAGE__->meta->make_immutable;
+sub _get_module_name {
+    my ($prefix, $name) = @_;
 
-__END__
+    # get Foo::BarBaz from a prefix ('Foo::') and a
+    # lowercase-underscored module name (bar_baz)
+
+    (my $module_name = $name) =~ s/^(\w)/\U$1/;
+    $module_name =~ s/_(\w)/\U$1/g;
+
+    return $prefix . $module_name;
+}
+
+
+__PACKAGE__->meta->make_immutable;
 
 =head1 SYNOPSIS
 
