@@ -71,12 +71,7 @@ sub _build__coord_extractor {
 
 has _raw_error => ( is => 'rw' );
 
-has error => (
-    is         => 'ro',
-    lazy_build => 1,
-);
-
-sub _build_error {
+sub error {
     my $self = shift;
 
     # Calling cluster_count before _raw_error guarantees that _raw_error
