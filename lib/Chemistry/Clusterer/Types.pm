@@ -1,6 +1,6 @@
 package Chemistry::Clusterer::Types;
 
-# ABSTRACT: Specific types for Bio::Protease
+# ABSTRACT: Specific types for Chemistry::Clusterer
 
 use MooseX::Types::Moose qw(ArrayRef HashRef Num FileHandle Str);
 use MooseX::Types -declare => [
@@ -103,3 +103,5 @@ sub _parse_coords {
 }
 
 __PACKAGE__->meta->make_immutable;
+
+__END__

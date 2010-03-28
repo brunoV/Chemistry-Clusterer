@@ -221,31 +221,112 @@ sub _get_module_name {
     return $prefix . $module_name;
 }
 
-
 __PACKAGE__->meta->make_immutable;
+
+__END__
 
 =head1 SYNOPSIS
 
-   use Chemistry::Clusterer
+   use Chemistry::Clusterer;
+
+   my $clusterer = Chemistry::Clusterer->new(
+       structures      => \@structures,
+       grouping_method => { number => 10 },
+
+   );
+
+   say $clusterer->error;
+   say $clusterer->cluster_count;
+
+   foreach my $cluster ( @{ $clusterer->clusters } ) {
+       say $cluster->size;
+       say $cluster->centroid->coords;
+    }
 
 =head1 DESCRIPTION
 
 This module provides a means for clustering or grouping a collection
 of structural/spacial variants of a macromolecular structure according
 to their RMSD values. This helps reduce the complexity of the collection
-by grouping together similar representations into Clusters, which can be
+by grouping together similar representations into clusters, which can be
 then analyzed as a single entity.
 
-The main application for which this module is useful is the case where
-there are many spatial (position/orientation) variants of a single protein
-structure, as a result of protein-protein docking simulations. Tipically,
-one would have to deal with thousands of decoys, unless some sort
-of clustering or grouping of similar result is carried out.
+The CPU intensive parts are done with the C Clustering library, by means
+of the L<Algorithm::Cluster> module.
 
-Another potential use would be to cluster different homology models; care
-should be taken though to first structurally align the models before,
-since this module will calculate the euclidian distance between all alpha
-carbons without attempting to align the structures first.
+=attr structures
 
-The CPU intensive parts are done by a the C Clustering library, properly
-wrapped by the Algorithm::Cluster module.
+An array reference of L<Chemistry::Clusterer::Structure> entities.
+You can also provide an array reference of opened filehandles of each of
+the structures, or a string with the contents of the PDB file of each
+structure.
+
+Required.
+
+=attr grouping_method
+
+The criteria with which to choose the desired number of clusters.
+Default is C<< distance => 5 >>.
+
+options are:
+
+=head3 distance
+
+    grouping_method => { distance => $d }
+
+The final number of clusters will be chosen so that the average distance
+between the centroids of the members of a single cluster is less or
+equal to C<$d> Angstroms. In other words, it's the average radius of the
+sphere that contains all centroids of each cluster.
+
+=head3 number
+
+    grouping_method => { number => $n }
+
+Simply select the exact number of clusters you want.
+=method structure_count
+
+Returns the total number of structures used for clustering.
+
+=attr coordinates_from
+
+Defines what subset of atoms to use for the clustering.
+
+It's a L<Chemistry::Clusterer::CoordExtractor> object that extracts the
+coordinates of the desired atoms from each of the structures.
+
+By default it uses coordinates from alpha carbons, using
+L<Chemistry::Clusterer::CoordExtractor::AtomType>.
+
+If you wanted to also use the coordinates of, say, the rest of carbon atoms, you'd say:
+
+    coordinates_from => { atom_type => ['CA', 'C'] };
+
+The key of the hash reference selects which coordinate extractor to use,
+in this case C<AtomType>.  The value is an array reference with the atom
+types to extract their coordinates from.
+
+Other extractor classes to use are
+L<Chemistry::Clusterer::CoordExtractor::Chain>, which selects all atoms
+of a given chain, and L<Chemistry::Clusterer::CoordExtractor::All>,
+which simply uses all atoms.
+
+For instance:
+
+    coordinates_from => { chain => ['A', 'B'] };
+
+    coordinates_from => 'all'; # same as { all => [ undef ] };
+
+
+=attr clusters
+
+An array reference of L<Chemistry::Clusterer::Cluster> entities, each
+representing a single cluster. It is lazily computed upon request.
+
+=method cluster_count
+
+The total number of clusters
+
+=method error
+
+The total clustering error

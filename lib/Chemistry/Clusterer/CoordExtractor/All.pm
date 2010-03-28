@@ -21,3 +21,13 @@ sub extract_coords {
 }
 
 __PACKAGE__->meta->make_immutable;
+
+=head1 SYNOPSIS
+
+    # When building a Chemistry::Clusterer instance...
+
+    coordinates_from => 'all'
+
+=head1 DESCRIPTION
+
+Extracts coordinates from all atoms.
