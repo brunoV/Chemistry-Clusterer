@@ -1,15 +1,5 @@
-* Input file format flexibility
-
-    have a parser attribute with a delegate object for parsing. Defaulting to a
-    custom pdb parser 'pdb'. Optionally, other file formats,
-    Chemistry::MacroMol and Bio::Structure parsers. They should all consume a
-    'parser' role.
-
-    Make it pluggable in the sense that the user should just say the name, and
-    it will look in the appropriate namespace and load that module.
-
-* Accept Chemistry::Mol and, if I feel like it, Bio::Structure objects
 * Add an option to align all structures before clustering
+* Accept Chemistry::Mol and, if I feel like it, Bio::Structure objects
 * Maybe parse the header in PDB files, and attach it to the Structure
 * Make the coordinate extractor composable, so that you can do
     coordinate_extractor => [ { atom_type => ['CA'], chain => ['A'] ];
