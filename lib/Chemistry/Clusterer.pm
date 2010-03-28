@@ -83,10 +83,11 @@ sub error {
     return sqrt( $self->_raw_error / ( $nstructs - $nclusters ) );
 }
 
+
 has grouping_method => (
     is         => 'ro',
     isa        => HashRef,
-    default    => sub { +{ radius => 5 } },
+    default    => sub { +{ distance => 5 } },
     auto_deref => 1,
 );
 
@@ -97,8 +98,8 @@ sub _build_clusters {
     my $distances = $self->_calc_distance_matrix();
 
     my $nclusters =
-      exists $self->grouping_method->{radius}
-      ? _radius_to_number( $self->grouping_method->{radius}, $distances )
+      exists $self->grouping_method->{distance}
+      ? _distance_to_number( $self->grouping_method->{distance}, $distances )
       : $self->grouping_method->{number};
 
     my %clust_params = (
@@ -189,16 +190,15 @@ sub _calc_distance_matrix {
     return $distance_matrix;
 }
 
-sub _radius_to_number {
+sub _distance_to_number {
 
-    # Calculate cluster number given a radius threshold.
+    # Calculate cluster number given a distance threshold.
 
-    croak "Need a radius and a distance matrix" unless @_ == 2;
-    my ( $radius, $distance_matrix ) = @_;
+    my ( $threshold, $distance_matrix ) = @_;
 
     my $nclusters = @{$distance_matrix};
     foreach my $row ( @{$distance_matrix} ) {
-        --$nclusters if grep { $_ < $radius**2 } @{$row};
+        --$nclusters if grep { $_ < $threshold**2 } @{$row};
     }
 
     return $nclusters;
