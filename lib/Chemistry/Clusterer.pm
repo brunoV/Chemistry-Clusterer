@@ -23,6 +23,7 @@ has structures => (
 has clusters => (
     is         => 'ro',
     isa        => ArrayRef,
+    init_arg   => undef,
     lazy_build => 1,
     traits  => ['Array'],
     handles => {
@@ -38,6 +39,7 @@ has coordinates_from => (
 has _coord_extractor => (
     is         => 'ro',
     lazy_build => 1,
+    init_arg   => undef,
     handles    => {
         _extract_coords => 'extract_coords'
     },
