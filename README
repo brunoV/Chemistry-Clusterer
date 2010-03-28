@@ -1,12 +1,114 @@
+NAME
+    Chemistry::Clusterer - Cluster spatial variants of macromolecular
+    structures
 
+VERSION
+    version 0.100870
 
-This archive contains the distribution Chemistry-Clusterer, version
-0.100870:
+SYNOPSIS
+       use Chemistry::Clusterer;
 
-  Cluster spatial variants of macromolecular structures
+       my $clusterer = Chemistry::Clusterer->new(
+           structures      => \@structures,
+           grouping_method => { number => 10 },
 
-This software is copyright (c) 2010 by Bruno Vecchi.
+       );
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+       say $clusterer->error;
+       say $clusterer->cluster_count;
+
+       foreach my $cluster ( @{ $clusterer->clusters } ) {
+           say $cluster->size;
+           say $cluster->centroid->coords;
+        }
+
+DESCRIPTION
+    This module provides a means for clustering or grouping a collection of
+    structural/spacial variants of a macromolecular structure according to
+    their RMSD values. This helps reduce the complexity of the collection by
+    grouping together similar representations into clusters, which can be
+    then analyzed as a single entity.
+
+    The CPU intensive parts are done with the C Clustering library, by means
+    of the Algorithm::Cluster module.
+
+ATTRIBUTES
+  structures
+    An array reference of Chemistry::Clusterer::Structure entities. You can
+    also provide an array reference of opened filehandles of each of the
+    structures, or a string with the contents of the PDB file of each
+    structure.
+
+    Required.
+
+  grouping_method
+    The criteria with which to choose the desired number of clusters.
+    Default is "distance => 5".
+
+    options are:
+
+   distance
+        grouping_method => { distance => $d }
+
+    The final number of clusters will be chosen so that the average distance
+    between the centroids of the members of a single cluster is less or
+    equal to $d Angstroms. In other words, it's the average radius of the
+    sphere that contains all centroids of each cluster.
+
+   number
+        grouping_method => { number => $n }
+
+    Simply select the exact number of clusters you want.
+
+  coordinates_from
+    Defines what subset of atoms to use for the clustering.
+
+    It's a Chemistry::Clusterer::CoordExtractor object that extracts the
+    coordinates of the desired atoms from each of the structures.
+
+    By default it uses coordinates from alpha carbons, using
+    Chemistry::Clusterer::CoordExtractor::AtomType.
+
+    If you wanted to also use the coordinates of, say, the rest of carbon
+    atoms, you'd say:
+
+        coordinates_from => { atom_type => ['CA', 'C'] };
+
+    The key of the hash reference selects which coordinate extractor to use,
+    in this case "AtomType". The value is an array reference with the atom
+    types to extract their coordinates from.
+
+    Other extractor classes to use are
+    Chemistry::Clusterer::CoordExtractor::Chain, which selects all atoms of
+    a given chain, and Chemistry::Clusterer::CoordExtractor::All, which
+    simply uses all atoms.
+
+    For instance:
+
+        coordinates_from => { chain => ['A', 'B'] };
+
+        coordinates_from => 'all'; # same as { all => [ undef ] };
+
+  clusters
+    An array reference of Chemistry::Clusterer::Cluster entities, each
+    representing a single cluster. It is lazily computed upon request.
+
+METHODS
+  structure_count
+    Returns the total number of structures used for clustering.
+
+  cluster_count
+    The total number of clusters
+
+  error
+    The total clustering error
+
+AUTHOR
+      Bruno Vecchi <vecchi.b gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Bruno Vecchi.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 
