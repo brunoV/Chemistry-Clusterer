@@ -11,3 +11,5 @@
 * Accept Chemistry::Mol and, if I feel like it, Bio::Structure objects
 * Add an option to align all structures before clustering
 * Maybe parse the header in PDB files, and attach it to the Structure
+* Make the coordinate extractor composable, so that you can do
+    coordinate_extractor => [ { atom_type => ['CA'], chain => ['A'] ];
