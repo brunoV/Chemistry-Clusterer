@@ -279,6 +279,7 @@ sphere that contains all centroids of each cluster.
     grouping_method => { number => $n }
 
 Simply select the exact number of clusters you want.
+
 =method structure_count
 
 Returns the total number of structures used for clustering.

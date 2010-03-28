@@ -1,6 +1,6 @@
 package Chemistry::Clusterer::Cluster;
 
-# ABSTRACT: A group of similar things, with a centroid and a score
+# ABSTRACT: A group of similar things, with a centroid.
 
 use Moose;
 use MooseX::Types::Moose qw(ArrayRef);
@@ -36,8 +36,9 @@ __END__
 
 =head1 DESCRIPTION
 
-This class represents a group of L<Chemistry::Clusterer::Structure>
-elements that were considered as part of a single cluster.
+L<Chemistry::Clusterer::Cluster> holds a group of
+L<Chemistry::Clusterer::Structure> elements that were considered as part
+of a single cluster.
 
 =attr members
 

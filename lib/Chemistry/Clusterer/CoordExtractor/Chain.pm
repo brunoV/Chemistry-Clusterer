@@ -1,4 +1,7 @@
 package Chemistry::Clusterer::CoordExtractor::Chain;
+
+# ABSTRACT: Extract coordinates of atoms from certain chains
+
 use Moose;
 
 extends 'Chemistry::Clusterer::CoordExtractor';

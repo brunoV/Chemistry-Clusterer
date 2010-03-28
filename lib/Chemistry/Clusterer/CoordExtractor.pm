@@ -18,6 +18,15 @@ sub extract_coords {
 
 __PACKAGE__->meta->make_immutable;
 
+=head1 SYNOPSIS
+
+    package Chemistry::Clusterer::CoordExtractor::MyExtractor;
+    use Moose;
+
+    extends 'Chemistry::Clusterer::CoordExtractor';
+
+    sub extract_coords { ... };
+
 =head1 DESCRIPTION
 
 This is a base for child classes that extract different subsets of
