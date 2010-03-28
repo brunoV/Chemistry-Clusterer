@@ -1,4 +1,7 @@
 package Chemistry::Clusterer::Structure;
+
+# ABSTRACT: A thing that holds coordinates, representing a molecule
+
 use Moose;
 use Chemistry::Clusterer::Types qw(StructureCoords);
 
