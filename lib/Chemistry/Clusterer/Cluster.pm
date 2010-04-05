@@ -8,7 +8,6 @@ use MooseX::Types::Moose qw(ArrayRef);
 has members => (
     is       => 'ro',
     isa      => 'ArrayRef',
-    init_arg => undef,
     default  => sub { [] },
     traits   => ['Array'],
     handles  => {
