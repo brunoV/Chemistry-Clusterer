@@ -47,11 +47,17 @@ sub _fh_to_structure {
 sub _fh_to_coords {
     my $fh = shift;
 
-    my @lines = <$fh>;
+    my %coords;
 
-    my $coords = _parse_coords(\@lines);
+    while( my $line = <$fh> ) {
+        my ($atom_type, $chain_id, $x, $y, $z) = _parse_line($line);
 
-    return $coords;
+        $atom_type || next;
+
+        push @{$coords{$atom_type}{$chain_id}}, ($x, $y, $z);
+    }
+
+    return \%coords;
 }
 
 sub _str_to_structure {
@@ -70,36 +76,35 @@ sub _str_to_coords {
 
     my @lines = split "\n", $content;
 
-    my $coords = _parse_coords(\@lines);
+    my %coords;
 
-    return $coords;
-}
+    foreach my $line (@lines) {
+        my ($atom_type, $chain_id, $x, $y, $z) = _parse_line($line);
 
-sub _parse_coords {
+        $atom_type || next;
 
-    # Get the coordinates of the alpha carbons from a PDB file
-
-    my $lines = shift;
-
-    my %xyz;
-
-    foreach my $line (@$lines) {
-        my ($atom_type, $chain_id, $x, $y, $z) = $line =~ m{
-            ^ATOM      # Atom entry
-            \s+\S+\s+
-            (\S+)      # Atom type
-            \s+\S+\s+
-            (\S+)      # Chain id
-            \s+\S+\s+
-            (\S+)\s+   # x coord
-            (\S+)\s+   # y coord
-            (\S+)      # z coord
-        }x or next;
-
-        push @{$xyz{$atom_type}{$chain_id}}, ($x, $y, $z);
+        push @{$coords{$atom_type}{$chain_id}}, ($x, $y, $z);
     }
 
-    return \%xyz;
+    return \%coords;
+}
+
+sub _parse_line {
+    my $line = shift;
+
+    my ($atom_type, $chain_id, $x, $y, $z) = $line =~ m{
+        ^ATOM      # Atom entry
+        \s+\S+\s+
+        (\S+)      # Atom type
+        \s+\S+\s+
+        (\S+)      # Chain id
+        \s+\S+\s+
+        (\S+)\s+   # x coord
+        (\S+)\s+   # y coord
+        (\S+)      # z coord
+    }x or return;
+
+    return ($atom_type, $chain_id, $x, $y, $z);
 }
 
 __PACKAGE__->meta->make_immutable;
